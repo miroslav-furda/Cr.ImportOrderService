@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class DeliveryConfirmationImportImpl implements DeliveryConfirmationImport {
 
     @Override
-    public Stream<Path> readCsvFile(String file) {
+    public Stream<Path> readFile(String file) {
         return null;
     }
 }

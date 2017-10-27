@@ -38,7 +38,7 @@ public class FtpServerListener extends DefaultFtplet {
         log.info("Finished Uploading " + request.getArgument());
 
 //        TODO FLOW-38
-        deliveryConfirmationImport.readCsvFile(request.getArgument());
+        deliveryConfirmationImport.readFile(request.getArgument());
         return super.onUploadEnd(session, request);
     }
 

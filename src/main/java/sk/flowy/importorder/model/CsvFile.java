@@ -14,6 +14,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CsvFile implements Serializable {
 
+    private static final long serialVersionUID = -1562764096877960975L;
+
     private Integer ico;
     private String name;
 

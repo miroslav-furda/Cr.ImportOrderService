@@ -37,7 +37,6 @@ public class FtpServerListener extends DefaultFtplet {
     public FtpletResult onUploadEnd(FtpSession session, FtpRequest request) throws FtpException, IOException {
         log.info("Finished Uploading " + request.getArgument());
 
-//        TODO FLOW-38
         deliveryConfirmationImport.readFile(request.getArgument());
         return super.onUploadEnd(session, request);
     }

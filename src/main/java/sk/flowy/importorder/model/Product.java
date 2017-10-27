@@ -39,7 +39,7 @@ public class Product implements Serializable {
     private String nameClear;
 
     @Column(name = "aktivny")
-    private Integer active;
+    private Integer active = 1;
 
     private Boolean weighted;
 

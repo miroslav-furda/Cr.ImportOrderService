@@ -19,6 +19,7 @@ import java.util.List;
 public class Supplier implements Serializable{
 
     private static final long serialVersionUID = -528414481097612186L;
+
     @GeneratedValue
     @Id
     private Long id;

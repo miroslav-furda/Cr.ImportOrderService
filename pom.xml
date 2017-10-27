@@ -85,8 +85,6 @@
 			<artifactId>ftpserver-core</artifactId>
 			<version>RELEASE</version>
 		</dependency>
-
-		<!--TODO FLOW-38-->
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>

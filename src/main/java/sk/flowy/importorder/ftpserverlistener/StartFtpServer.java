@@ -2,6 +2,8 @@ package sk.flowy.importorder.ftpserverlistener;
 
 import lombok.extern.log4j.Log4j;
 import org.apache.ftpserver.ConnectionConfigFactory;
+import org.apache.ftpserver.FtpServer;
+import org.apache.ftpserver.FtpServerConfigurationException;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Authority;
 import org.apache.ftpserver.ftplet.FtpException;
@@ -21,7 +23,7 @@ import java.util.List;
 
 @Log4j
 @Component
-public class FtpServer {
+public class StartFtpServer {
 
     @Autowired
     private FtpServerListener ftpServerListener;
@@ -36,8 +38,6 @@ public class FtpServer {
 
             ListenerFactory listenerFactory = new ListenerFactory();
             listenerFactory.setPort(Integer.parseInt(env.getProperty("fptServerPort")));
-//            TODO FLOW-163
-            listenerFactory.setServerAddress(env.getProperty("ftpServerAddress"));
             listenerFactory.setIdleTimeout(Integer.parseInt(env.getProperty("ftpIdleTimeout")));
 
             ftpServerFactory.addListener("default", listenerFactory.createListener());
@@ -61,11 +61,12 @@ public class FtpServer {
 
             userManager.save(user);
 
-            org.apache.ftpserver.FtpServer server = ftpServerFactory.createServer();
+            FtpServer server = ftpServerFactory.createServer();
             server.start();
             log.info("FTP server is running!");
         } catch (FtpException e) {
-            log.error("Export creation failed ", e);
+            log.error("Start FPT server failed", e);
+            throw new FtpServerConfigurationException("Start FPT server failed", e);
         }
     }
 }

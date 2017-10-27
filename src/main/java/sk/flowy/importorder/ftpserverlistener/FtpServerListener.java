@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j;
 import org.apache.ftpserver.ftplet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import sk.flowy.importorder.service.DeliveryConfirmationImport;
+import sk.flowy.importorder.service.OrderConfirmationDbImport;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
 public class FtpServerListener extends DefaultFtplet {
 
     @Autowired
-    private DeliveryConfirmationImport deliveryConfirmationImport;
+    private OrderConfirmationDbImport orderConfirmationDbImport;
 
     @Override
     public FtpletResult onLogin(FtpSession session, FtpRequest request) throws FtpException, IOException {
@@ -37,7 +37,7 @@ public class FtpServerListener extends DefaultFtplet {
     public FtpletResult onUploadEnd(FtpSession session, FtpRequest request) throws FtpException, IOException {
         log.info("Finished Uploading " + request.getArgument());
 
-        deliveryConfirmationImport.readFile(request.getArgument());
+        orderConfirmationDbImport.importFile(request.getArgument());
         return super.onUploadEnd(session, request);
     }
 

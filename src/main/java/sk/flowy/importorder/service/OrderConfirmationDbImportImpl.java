@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 
 @Log4j
 @Service
-public class DeliveryConfirmationImportImpl implements DeliveryConfirmationImport {
+public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport {
 
     @Override
-    public void readFile(String file) {
+    public void importFile(String file) {
     }
 }

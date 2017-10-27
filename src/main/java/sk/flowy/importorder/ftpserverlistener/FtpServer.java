@@ -11,6 +11,7 @@ import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.apache.ftpserver.usermanager.impl.BaseUser;
 import org.apache.ftpserver.usermanager.impl.WritePermission;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -25,18 +26,19 @@ public class FtpServer {
     @Autowired
     private FtpServerListener ftpServerListener;
 
+    @Autowired
+    private Environment env;
+
     @PostConstruct
     public void startFtpServer() {
         try {
             FtpServerFactory ftpServerFactory = new FtpServerFactory();
 
             ListenerFactory listenerFactory = new ListenerFactory();
-            // set the port of the listener
-            listenerFactory.setPort(5000);
-//            TODO change server address
-//            listenerFactory.setServerAddress("127.0.0.1");
-            listenerFactory.setIdleTimeout(3000);
-
+            listenerFactory.setPort(Integer.parseInt(env.getProperty("fptServerPort")));
+//            TODO FLOW-163
+            listenerFactory.setServerAddress(env.getProperty("ftpServerAddress"));
+            listenerFactory.setIdleTimeout(Integer.parseInt(env.getProperty("ftpIdleTimeout")));
 
             ftpServerFactory.addListener("default", listenerFactory.createListener());
             ftpServerFactory.getFtplets().put(ftpServerListener.getClass().getName(), ftpServerListener);
@@ -49,8 +51,8 @@ public class FtpServer {
             ftpServerFactory.setUserManager(userManagerFactory.createUserManager());
 
             BaseUser user = new BaseUser();
-            user.setName("admin");
-            user.setPassword("admin");
+            user.setName(env.getProperty("ftpUserName"));
+            user.setPassword(env.getProperty("ftpUserPassword"));
             UserManager userManager = ftpServerFactory.getUserManager();
 
             List<Authority> authorities = new ArrayList<>();

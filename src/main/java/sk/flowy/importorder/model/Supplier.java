@@ -8,15 +8,15 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
-@Entity
-@Table(name = "dodavatel")
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Supplier implements Serializable{
+@Entity
+@Table(name = "dodavatel")
+public class Supplier implements Serializable {
 
     private static final long serialVersionUID = -528414481097612186L;
 
@@ -32,7 +32,9 @@ public class Supplier implements Serializable{
 
     @Column(name = "adresa")
     private String address;
+
     private Integer ico;
+
     private Integer dic;
 
     @Column(name = "ic_dph")
@@ -49,12 +51,6 @@ public class Supplier implements Serializable{
 
     @Column(name = "aktivny")
     private Integer active;
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "dodavatel_produkt", joinColumns = @JoinColumn(name = "id_dodavatel", referencedColumnName =
-            "id"),
-            inverseJoinColumns = @JoinColumn(name = "id_produkt", referencedColumnName = "id"))
-    private List<Product> products;
 
     @Override
     public boolean equals(Object o) {

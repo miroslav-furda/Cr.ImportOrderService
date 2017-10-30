@@ -28,22 +28,22 @@ public class Client implements Serializable{
     @ApiModelProperty(notes = "The database generated ean ID")
     private Long id;
 
-    @Column(name = "nazov", nullable = false)
+    @Column(name = "nazov")
     private String name;
 
-    @Column(name = "firma", nullable = false)
+    @Column(name = "firma")
     private String company;
 
-    @Column(name = "adresa", nullable = false)
+    @Column(name = "adresa")
     private String address;
 
-    @Column(name = "ico", nullable = false)
+    @Column(name = "ico")
     private Integer ico;
 
-    @Column(name = "dic", nullable = false)
+    @Column(name = "dic")
     private Integer dic;
 
-    @Column(name = "ic_dph", nullable = false)
+    @Column(name = "ic_dph")
     private String icDph;
 
     @Column(name = "aktivny")

@@ -12,11 +12,18 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CsvFile implements Serializable {
+public class ImportCsvFile implements Serializable {
 
     private static final long serialVersionUID = -1562764096877960975L;
 
-    private Integer ico;
-    private String name;
-
+    //Client
+    private Integer clientIco;
+    private String clientName;
+    //Supplier
+    private Integer supplierIco;
+    private String supplierName;
+    //Product
+    private String ean;
+    private Integer productCount;
+    private Double price;
 }

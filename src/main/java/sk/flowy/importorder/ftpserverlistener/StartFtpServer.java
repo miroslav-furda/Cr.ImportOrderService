@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Log4j
-//@Component
+@Component
 public class StartFtpServer {
 
     @Autowired

@@ -64,7 +64,10 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
             return true;
         } catch (IOException e) {
             log.error("Input file is not csv file ", e);
-            throw new CsvRuntimeException(String.format("input file is not csv file %s", e.getMessage()));
+            throw new CsvRuntimeException(String.format("Input file is not csv file %s", e.getMessage()));
+        } catch (RuntimeException e) {
+            log.error("Import CSV file contains null or empty values ", e);
+            throw new CsvRuntimeException("Error parsing CSV file");
         }
     }
 
@@ -103,7 +106,7 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
                             order.setClientId(client.getId().intValue());
                             order.setSupplierId(supplier.getId().intValue());
                             order.setName("todo");
-                            orderRepository.save(order);
+                            this.order = orderRepository.save(order);
                         });
                     });
                 }
@@ -119,11 +122,12 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
                         ean.setProduct(product);
 
                         OrderProduct orderProduct = new OrderProduct();
-
-                        orderProduct.setProductId(product.getId().intValue());
                         orderProduct.setCount(importImportCsvFile.getProductCount());
                         orderProduct.setPrise(importImportCsvFile.getPrice());
                         orderProduct.setConfirmation(1);
+                        if (product.getId() != null) {
+                            orderProduct.setProductId(product.getId().intValue());
+                        }
                         if (order != null) {
                             orderProduct.setOrderId(order.getId().intValue());
                         }

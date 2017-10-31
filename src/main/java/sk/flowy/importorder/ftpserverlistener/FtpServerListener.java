@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 @Log4j
-//@Controller
+@Controller
 public class FtpServerListener extends DefaultFtplet {
 
     @Autowired

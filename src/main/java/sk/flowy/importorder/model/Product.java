@@ -73,8 +73,4 @@ public class Product implements Serializable {
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
     }
-
-    public Product(String name) {
-        this.name = name;
-    }
 }

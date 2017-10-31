@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
@@ -18,7 +19,9 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Entity
 @Table(name = "objednavky_produkt")
-public class OrderProduct {
+public class OrderProduct implements Serializable{
+
+    private static final long serialVersionUID = -876200228310806325L;
 
     @Id
     @GeneratedValue

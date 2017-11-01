@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sk.flowy.importorder.model.*;
-import sk.flowy.importorder.repository.*;
+import sk.flowy.importorder.repository.EanRepository;
+import sk.flowy.importorder.repository.OrderProductRepository;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,29 +23,18 @@ import java.util.List;
 
 @Log4j
 @Service
+@Transactional
 public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport {
 
-    private ClientRepository clientRepository;
-    private SupplierRepository supplierRepository;
     private EanRepository eanRepository;
-    private ProductRepository productRepository;
     private OrderProductRepository orderProductRepository;
-    private OrderRepository orderRepository;
-    private Order order;
+    private Client clientWithIco;
+    private Supplier supplierWithIco;
 
     @Autowired
-    public OrderConfirmationDbImportImpl(ClientRepository clientRepository,
-                                         SupplierRepository supplierRepository,
-                                         EanRepository eanRepository,
-                                         ProductRepository productRepository,
-                                         OrderProductRepository orderProductRepository,
-                                         OrderRepository orderRepository) {
-        this.clientRepository = clientRepository;
-        this.supplierRepository = supplierRepository;
+    public OrderConfirmationDbImportImpl(EanRepository eanRepository, OrderProductRepository orderProductRepository) {
         this.eanRepository = eanRepository;
-        this.productRepository = productRepository;
         this.orderProductRepository = orderProductRepository;
-        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -57,86 +47,88 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
             List<ImportCsvFile> list = csv.parse(setColumMapping(), csvFile);
             if (list != null) {
                 OrderProduct orderProduct = this.saveDataForConfirmation(list);
-                if (orderProduct == null) {
-                    return false;
-                }
+                return orderProduct != null;
             }
-            return true;
+            return false;
         } catch (IOException e) {
             log.error("Input file is not csv file ", e);
             throw new CsvRuntimeException(String.format("Input file is not csv file %s", e.getMessage()));
-        } catch (RuntimeException e) {
-            log.error("Import CSV file contains null or empty values ", e);
-            throw new CsvRuntimeException("Error parsing CSV file");
         }
     }
 
     private ColumnPositionMappingStrategy setColumMapping() {
         ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
         strategy.setType(ImportCsvFile.class);
-        String[] columns = new String[]{"clientIco", "clientName", "supplierIco", "supplierName", "ean", "productCount", "price"};
+        String[] columns = new String[]{"clientIco", "supplierIco", "ean", "productCount", "price", "orderName"};
         strategy.setColumnMapping(columns);
         return strategy;
     }
 
 
-    @Transactional
-    OrderProduct saveDataForConfirmation(List<ImportCsvFile> list) {
+    private OrderProduct saveDataForConfirmation(List<ImportCsvFile> list) {
         for (ImportCsvFile importImportCsvFile : list) {
-            if (StringUtils.isNotEmpty(importImportCsvFile.getClientName()) || StringUtils.isNotEmpty(importImportCsvFile.getEan()) || StringUtils.isNotEmpty(importImportCsvFile.getSupplierName())) {
-
-                List<Client> clients = clientRepository.findByIco(importImportCsvFile.getClientIco());
-                if (CollectionUtils.isEmpty(clients)) {
-                    log.info("client is not found in database");
-                    return null;
-                }
-
-                List<Supplier> suppliers = supplierRepository.findByIco(importImportCsvFile.getSupplierIco());
-                if (CollectionUtils.isEmpty(clients)) {
-                    log.info("supplier is not found in database");
-                    return null;
-                }
-
-
-                if (clients.size() == suppliers.size()) {
-                    //create new order
-                    clients.forEach(client -> {
-                        suppliers.forEach(supplier -> {
-                            this.order = new Order();
-                            order.setClientId(client.getId().intValue());
-                            order.setSupplierId(supplier.getId().intValue());
-                            order.setName("todo");
-                            this.order = orderRepository.save(order);
-                        });
-                    });
-                }
-
-
+            if (checkIfVariableIsNull(importImportCsvFile)) {
                 Ean ean = eanRepository.findByValue(importImportCsvFile.getEan());
                 if (ean == null) {
                     log.info("ean is not found in database");
                     return null;
                 } else {
-                    Product product = productRepository.findByEans(Arrays.asList(ean));
+                    Product product = ean.getProduct();
                     if (product != null) {
-                        ean.setProduct(product);
+
+                        List<Supplier> suppliers = product.getSuppliers();
+                        if (CollectionUtils.isEmpty(suppliers)) {
+                            log.info("supplier is not found in database");
+                            return null;
+                        }
+
+                        suppliers.forEach(supp -> {
+                            if (supp.getIco().equals(importImportCsvFile.getSupplierIco())) {
+                                this.supplierWithIco = supp;
+                            }
+                        });
+
+                        List<Client> clients = supplierWithIco.getClients();
+                        if (CollectionUtils.isEmpty(clients)) {
+                            log.info("client is not found in database");
+                            return null;
+                        }
+
+                        clients.forEach(client -> {
+                            if (client.getIco().equals(importImportCsvFile.getClientIco())) {
+                                this.clientWithIco = client;
+                            }
+                        });
+
+                        Order order = new Order();
+                        order.setClient(clientWithIco);
+                        order.setSupplier(supplierWithIco);
+                        order.setName(importImportCsvFile.getOrderName());
+                        order.setOrdersProducts(Arrays.asList(product));
+
 
                         OrderProduct orderProduct = new OrderProduct();
+                        orderProduct.setProduct(product);
                         orderProduct.setCount(importImportCsvFile.getProductCount());
-                        orderProduct.setPrise(importImportCsvFile.getPrice());
-                        orderProduct.setConfirmation(1);
-                        if (product.getId() != null) {
-                            orderProduct.setProductId(product.getId().intValue());
-                        }
-                        if (order != null) {
-                            orderProduct.setOrderId(order.getId().intValue());
-                        }
+                        orderProduct.setPrice(importImportCsvFile.getPrice());
+                        orderProduct.setOrder(order);
                         return orderProductRepository.save(orderProduct);
                     }
+
                 }
+                return null;
             }
         }
         return null;
     }
 
+    private boolean checkIfVariableIsNull(ImportCsvFile importImportCsvFile) {
+        if (importImportCsvFile.getClientIco() != null
+                || importImportCsvFile.getSupplierIco() != null
+                || StringUtils.isNotEmpty(importImportCsvFile.getEan())
+                || StringUtils.isNotEmpty(importImportCsvFile.getOrderName())) {
+            return true;
+        }
+        return false;
+    }
 }

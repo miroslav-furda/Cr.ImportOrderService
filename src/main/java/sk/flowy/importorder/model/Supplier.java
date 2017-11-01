@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 @Getter
@@ -51,6 +52,24 @@ public class Supplier implements Serializable {
 
     @Column(name = "aktivny")
     private Integer active;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "dodavatel_produkt", joinColumns = @JoinColumn(name = "id_dodavatel", referencedColumnName =
+            "id"),
+            inverseJoinColumns = @JoinColumn(name = "id_produkt", referencedColumnName = "id"))
+    private List<Product> products;
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "dodavatel_klient",
+            joinColumns = @JoinColumn(name = "id_dodavatel", referencedColumnName ="id"),
+            inverseJoinColumns = @JoinColumn(name = "id_klient", referencedColumnName = "id"))
+    private List<Client> clients;
+
+    @OneToMany(mappedBy = "supplier")
+    private List<Order> orders;
+
+
+
 
     @Override
     public boolean equals(Object o) {

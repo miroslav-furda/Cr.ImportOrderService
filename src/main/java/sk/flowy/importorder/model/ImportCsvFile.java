@@ -18,12 +18,12 @@ public class ImportCsvFile implements Serializable {
 
     //Client
     private Integer clientIco;
-    private String clientName;
     //Supplier
     private Integer supplierIco;
-    private String supplierName;
     //Product
     private String ean;
     private Integer productCount;
     private Double price;
+    //Order name
+    private String orderName;
 }

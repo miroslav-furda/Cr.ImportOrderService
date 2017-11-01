@@ -1,6 +1,5 @@
 package sk.flowy.importorder.model;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,33 +18,50 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Entity
 @Table(name = "objednavky_produkt")
-public class OrderProduct implements Serializable{
+public class OrderProduct implements Serializable {
 
     private static final long serialVersionUID = -876200228310806325L;
 
     @Id
     @GeneratedValue
-    @ApiModelProperty(notes = "The database generated order product ID")
     private Long id;
-
-    @Column(name = "objednavka_id")
-    private Integer orderId;
-
-    @Column(name = "produkt_id")
-    private Integer productId;
 
     @Column(name = "pocet")
     private Integer count;
 
     @Column(name = "cena")
-    private Double prise;
+    private Double price;
 
     @Column(name = "potvrdene")
-    private Integer confirmation = 1;
+    private boolean confirmation;
 
     @Column(name = "created_at")
     private Timestamp created;
 
     @Column(name = "updated_at")
     private Timestamp updated;
+
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "objednavka_id")
+    private Order order;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "produkt_id")
+    private Product product;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OrderProduct that = (OrderProduct) o;
+
+        return id != null ? id.equals(that.id) : that.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

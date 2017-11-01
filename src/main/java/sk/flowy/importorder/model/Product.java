@@ -1,14 +1,11 @@
 package sk.flowy.importorder.model;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
@@ -27,12 +24,9 @@ public class Product implements Serializable {
     private static final long serialVersionUID = -1678839865508033288L;
     @Id
     @GeneratedValue
-    @ApiModelProperty(notes = "The database generated product ID")
     private Long id;
 
     @Column(name = "nazov")
-    @NotNull
-    @NotEmpty
     private String name;
 
     @Column(name = "nazov_clear")
@@ -55,8 +49,17 @@ public class Product implements Serializable {
     @Column(name = "deleted_at")
     private Timestamp deleted;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ean> eans;
+
+    @ManyToMany(mappedBy = "products", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Supplier> suppliers;
+
+    @ManyToMany(mappedBy = "ordersProducts", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<OrderProduct> orderProducts;
 
 
     @Override

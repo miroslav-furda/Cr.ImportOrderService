@@ -1,6 +1,5 @@
 package sk.flowy.importorder.model;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Product entity representing order table from database.
@@ -25,20 +25,13 @@ public class Order implements Serializable {
 
     @Id
     @GeneratedValue
-    @ApiModelProperty(notes = "The database generated order ID")
     private Long id;
 
     @Column(name = "nazov")
     private String name;
 
-    @Column(name = "id_klient")
-    private Integer clientId;
-
-    @Column(name = "id_dodavatel")
-    private Integer supplierId;
-
     @Column(name = "potvrdenie")
-    private Integer confirmation = 0;
+    private boolean confirmation;
 
     @Column(name = "created_at")
     private Timestamp created;
@@ -50,5 +43,36 @@ public class Order implements Serializable {
     private Timestamp dateOfOrder;
 
     @Column(name = "custom")
-    private Integer custom = 0;
+    private boolean custom;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "objednavky_produkt",
+            joinColumns = @JoinColumn(name = "objednavka_id", referencedColumnName ="id"),
+            inverseJoinColumns = @JoinColumn(name = "produkt_id", referencedColumnName = "id"))
+    private List<Product> ordersProducts;
+
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_klient")
+    private Client client;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_dodavatel")
+    private Supplier supplier;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Order order = (Order) o;
+
+        return id != null ? id.equals(order.id) : order.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

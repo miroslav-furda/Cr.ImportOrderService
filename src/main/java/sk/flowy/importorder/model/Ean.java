@@ -1,7 +1,5 @@
 package sk.flowy.importorder.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +24,6 @@ public class Ean implements Serializable {
 
     @Id
     @GeneratedValue
-    @ApiModelProperty(notes = "The database generated ean ID")
     private Long id;
 
     @Column(name = "typ")
@@ -46,7 +43,6 @@ public class Ean implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "id_produkt")
-    @JsonIgnore
     private Product product;
 
     @Override

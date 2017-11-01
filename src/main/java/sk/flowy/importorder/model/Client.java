@@ -1,6 +1,5 @@
 package sk.flowy.importorder.model;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * Client entity representing client table from database.
@@ -19,13 +19,12 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Entity
 @Table(name = "klient")
-public class Client implements Serializable{
+public class Client implements Serializable {
 
     private static final long serialVersionUID = 5320587843769173063L;
 
     @Id
     @GeneratedValue
-    @ApiModelProperty(notes = "The database generated ean ID")
     private Long id;
 
     @Column(name = "nazov")
@@ -57,4 +56,26 @@ public class Client implements Serializable{
 
     @Column(name = "deleted_at")
     private Timestamp deleted;
+
+    @ManyToMany(mappedBy = "clients")
+    private List<Supplier> suppliers;
+
+    @OneToMany(mappedBy = "client")
+    private List<Order> orders;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Client client = (Client) o;
+
+        return id != null ? id.equals(client.id) : client.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

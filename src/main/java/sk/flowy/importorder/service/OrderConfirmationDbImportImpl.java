@@ -1,8 +1,6 @@
 package sk.flowy.importorder.service;
 
-import com.opencsv.CSVReader;
-import com.opencsv.bean.ColumnPositionMappingStrategy;
-import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.exceptions.CsvRuntimeException;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -40,12 +38,12 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
     @Override
     public boolean importFile(File file) {
         try {
-            CSVReader csvFile = new CSVReader(new FileReader(file));
-            CsvToBean csv = new CsvToBean();
 
+            List<ImportCsvFile> list = new CsvToBeanBuilder<ImportCsvFile>(new FileReader(file))
+                    .withType(ImportCsvFile.class)
+                    .build().parse();
 
-            List<ImportCsvFile> list = csv.parse(setColumMapping(), csvFile);
-            if (list != null) {
+            if (CollectionUtils.isNotEmpty(list)) {
                 OrderProduct orderProduct = this.saveDataForConfirmation(list);
                 return orderProduct != null;
             }
@@ -55,15 +53,6 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
             throw new CsvRuntimeException(String.format("Input file is not csv file %s", e.getMessage()));
         }
     }
-
-    private ColumnPositionMappingStrategy setColumMapping() {
-        ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
-        strategy.setType(ImportCsvFile.class);
-        String[] columns = new String[]{"clientIco", "supplierIco", "ean", "productCount", "price", "orderName"};
-        strategy.setColumnMapping(columns);
-        return strategy;
-    }
-
 
     private OrderProduct saveDataForConfirmation(List<ImportCsvFile> list) {
         for (ImportCsvFile importImportCsvFile : list) {

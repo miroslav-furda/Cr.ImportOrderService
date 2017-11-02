@@ -1,9 +1,6 @@
 package sk.flowy.importorder.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,6 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode
 @Entity
 @Table(name = "dodavatel")
 public class Supplier implements Serializable {
@@ -61,28 +59,10 @@ public class Supplier implements Serializable {
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "dodavatel_klient",
-            joinColumns = @JoinColumn(name = "id_dodavatel", referencedColumnName ="id"),
+            joinColumns = @JoinColumn(name = "id_dodavatel", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "id_klient", referencedColumnName = "id"))
     private List<Client> clients;
 
     @OneToMany(mappedBy = "supplier")
     private List<Order> orders;
-
-
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Supplier supplier = (Supplier) o;
-
-        return id != null ? id.equals(supplier.id) : supplier.id == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
 }

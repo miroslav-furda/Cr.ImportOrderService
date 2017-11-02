@@ -1,9 +1,6 @@
 package sk.flowy.importorder.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EqualsAndHashCode
 @Table(name = "klient")
 public class Client implements Serializable {
 
@@ -62,20 +60,4 @@ public class Client implements Serializable {
 
     @OneToMany(mappedBy = "client")
     private List<Order> orders;
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Client client = (Client) o;
-
-        return id != null ? id.equals(client.id) : client.id == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
 }

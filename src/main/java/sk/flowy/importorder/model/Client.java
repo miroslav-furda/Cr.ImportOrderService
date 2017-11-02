@@ -46,7 +46,7 @@ public class Client implements Serializable {
     private String icDph;
 
     @Column(name = "aktivny")
-    private Integer active = 1;
+    private boolean active = true;
 
     @Column(name = "created_at")
     private Timestamp created;

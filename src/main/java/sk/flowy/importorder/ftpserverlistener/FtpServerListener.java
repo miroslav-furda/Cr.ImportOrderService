@@ -42,9 +42,10 @@ public class FtpServerListener extends DefaultFtplet {
         File importFile = ((NativeFtpFile) fptFile).getPhysicalFile();
         if (importFile != null) {
             if (orderConfirmationDbImport.importFile(importFile)) {
-                return super.onUploadEnd(session, request);
+                log.info("Data from input file was saved into database.");
             }
         }
-        return super.onDeleteEnd(session, request);
+        log.info("Data from input file can't save into database");
+        return super.onUploadEnd(session, request);
     }
 }

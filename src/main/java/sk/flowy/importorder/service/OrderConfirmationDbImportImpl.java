@@ -64,6 +64,7 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
                 } else {
                     Product product = ean.getProduct();
                     if (product != null) {
+                        Order order = new Order();
 
                         List<Supplier> suppliers = product.getSuppliers();
                         if (CollectionUtils.isEmpty(suppliers)) {
@@ -77,21 +78,29 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
                             }
                         });
 
-                        List<Client> clients = supplierWithIco.getClients();
-                        if (CollectionUtils.isEmpty(clients)) {
-                            log.info("client is not found in database");
+                        if (supplierWithIco == null) {
                             return null;
+                        } else {
+
+                            List<Client> clients = supplierWithIco.getClients();
+                            if (CollectionUtils.isEmpty(clients)) {
+                                log.info("client is not found in database");
+                                return null;
+                            }
+
+                            clients.forEach(client -> {
+                                if (client.getIco().equals(importImportCsvFile.getClientIco())) {
+                                    this.clientWithIco = client;
+                                }
+                            });
+
+                            if (clientWithIco == null) {
+                                return null;
+                            }
+                            order.setClient(clientWithIco);
+                            order.setSupplier(supplierWithIco);
                         }
 
-                        clients.forEach(client -> {
-                            if (client.getIco().equals(importImportCsvFile.getClientIco())) {
-                                this.clientWithIco = client;
-                            }
-                        });
-
-                        Order order = new Order();
-                        order.setClient(clientWithIco);
-                        order.setSupplier(supplierWithIco);
                         order.setName(importImportCsvFile.getOrderName());
                         order.setOrdersProducts(Arrays.asList(product));
 

@@ -47,7 +47,7 @@ public class StartFtpServer {
             ftpServerFactory.setConnectionConfig(configFactory.createConnectionConfig());
 
             PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
-            userManagerFactory.setFile(new File(getClass().getClassLoader().getResource("ftpusers.properties").getFile()));
+            userManagerFactory.setFile(new File("ftpusers.properties"));
             ftpServerFactory.setUserManager(userManagerFactory.createUserManager());
 
             BaseUser user = new BaseUser();

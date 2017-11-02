@@ -1,13 +1,11 @@
 package sk.flowy.importorder.ftpserverlistener;
 
 import lombok.extern.log4j.Log4j;
-import org.apache.ftpserver.filesystem.nativefs.impl.NativeFtpFile;
 import org.apache.ftpserver.ftplet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import sk.flowy.importorder.service.OrderConfirmationDbImport;
 
-import java.io.File;
 import java.io.IOException;
 
 @Log4j
@@ -38,14 +36,11 @@ public class FtpServerListener extends DefaultFtplet {
     @Override
     public FtpletResult onUploadEnd(FtpSession session, FtpRequest request) throws FtpException, IOException {
         log.info("Finished Uploading " + request.getArgument());
-        FtpFile fptFile = session.getFileSystemView().getFile(request.getArgument());
-        File importFile = ((NativeFtpFile) fptFile).getPhysicalFile();
-        if (importFile != null) {
-            if (orderConfirmationDbImport.importFile(importFile)) {
-                log.info("Data from input file was saved into database.");
-            }
-        }
-        log.info("Data from input file can't save into database");
+
+//        TODO FLOW-38
+        orderConfirmationDbImport.importFile(request.getArgument());
         return super.onUploadEnd(session, request);
     }
+
+
 }

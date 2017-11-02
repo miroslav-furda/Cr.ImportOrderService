@@ -4,7 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 
@@ -26,30 +25,7 @@ public class Supplier implements Serializable {
     @Column(name = "nazov")
     private String name;
 
-    @Column(name = "firma")
-    private String company;
-
-    @Column(name = "adresa")
-    private String address;
-
     private Integer ico;
-
-    private Integer dic;
-
-    @Column(name = "ic_dph")
-    private String icDph;
-
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    private Date updatedAt;
-
-    @Column(name = "deleted_at")
-    private Date deletedAt;
-
-    @Column(name = "aktivny")
-    private Integer active;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "dodavatel_produkt", joinColumns = @JoinColumn(name = "id_dodavatel", referencedColumnName =

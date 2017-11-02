@@ -24,20 +24,8 @@ public class Ean implements Serializable {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "typ")
-    private String type;
-
     @Column(name = "hodnota")
     private String value;
-
-    @Column(name = "created_at")
-    private Date createdAt;
-
-    @Column(name = "updated_at")
-    private Date updatedAt;
-
-    @Column(name = "deleted_at")
-    private Date deletedAt;
 
     @ManyToOne
     @JoinColumn(name = "id_produkt")

@@ -12,8 +12,10 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import sk.flowy.importorder.model.*;
+import sk.flowy.importorder.repository.ClientRepository;
 import sk.flowy.importorder.repository.EanRepository;
 import sk.flowy.importorder.repository.OrderProductRepository;
+import sk.flowy.importorder.repository.SupplierRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,13 +26,17 @@ import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 public class OrderConfirmationDbImportImplTest {
 
-
+    @MockBean
+    private ClientRepository clientRepository;
+    @MockBean
+    private SupplierRepository supplierRepository;
     @MockBean
     private EanRepository eanRepository;
     @MockBean
@@ -46,7 +52,7 @@ public class OrderConfirmationDbImportImplTest {
 
     @Before
     public void setup() {
-        this.orderConfirmationDbImport = new OrderConfirmationDbImportImpl(eanRepository, orderProductRepository);
+        this.orderConfirmationDbImport = new OrderConfirmationDbImportImpl(eanRepository, orderProductRepository, supplierRepository, clientRepository);
 
     }
 
@@ -114,8 +120,11 @@ public class OrderConfirmationDbImportImplTest {
 
         Order order = new Order();
         order.setId(1L);
+        order.setOrdersProducts(Arrays.asList(new OrderProduct()));
 
         when(eanRepository.findByValue(anyString())).thenReturn(ean);
+        when(clientRepository.findByIco(anyInt())).thenReturn(client);
+        when(supplierRepository.findByIco(anyInt())).thenReturn(supplier);
         when(orderProductRepository.save(any(OrderProduct.class))).thenReturn(new OrderProduct());
 
         assertTrue("Import csv data file is not saved into database", orderConfirmationDbImport.importFile(inputCsvFile));

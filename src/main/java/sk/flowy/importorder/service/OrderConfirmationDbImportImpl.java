@@ -9,13 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sk.flowy.importorder.model.*;
+import sk.flowy.importorder.repository.ClientRepository;
 import sk.flowy.importorder.repository.EanRepository;
 import sk.flowy.importorder.repository.OrderProductRepository;
+import sk.flowy.importorder.repository.SupplierRepository;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -26,19 +27,20 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
 
     private EanRepository eanRepository;
     private OrderProductRepository orderProductRepository;
-    private Client clientWithIco;
-    private Supplier supplierWithIco;
+    private ClientRepository clientRepository;
+    private SupplierRepository supplierRepository;
 
     @Autowired
-    public OrderConfirmationDbImportImpl(EanRepository eanRepository, OrderProductRepository orderProductRepository) {
+    public OrderConfirmationDbImportImpl(EanRepository eanRepository, OrderProductRepository orderProductRepository, SupplierRepository supplierRepository, ClientRepository clientRepository) {
         this.eanRepository = eanRepository;
         this.orderProductRepository = orderProductRepository;
+        this.clientRepository = clientRepository;
+        this.supplierRepository = supplierRepository;
     }
 
     @Override
     public boolean importFile(File file) {
         try {
-
             List<ImportCsvFile> list = new CsvToBeanBuilder<ImportCsvFile>(new FileReader(file))
                     .withType(ImportCsvFile.class)
                     .build().parse();
@@ -62,54 +64,48 @@ public class OrderConfirmationDbImportImpl implements OrderConfirmationDbImport 
                     log.info("ean is not found in database");
                     return null;
                 } else {
+                    Order order = new Order();
                     Product product = ean.getProduct();
                     if (product != null) {
-                        Order order = new Order();
+                        Client client = clientRepository.findByIco(importImportCsvFile.getClientIco());
+                        if (client == null) {
+                            log.info("client is not found in database");
+                            return null;
+                        }
+                        order.setClient(client);
 
-                        List<Supplier> suppliers = product.getSuppliers();
-                        if (CollectionUtils.isEmpty(suppliers)) {
+                        Supplier supplier = supplierRepository.findByIco(importImportCsvFile.getSupplierIco());
+                        if (supplier == null) {
                             log.info("supplier is not found in database");
                             return null;
                         }
-
-                        suppliers.forEach(supp -> {
-                            if (supp.getIco().equals(importImportCsvFile.getSupplierIco())) {
-                                this.supplierWithIco = supp;
+                        if (CollectionUtils.isNotEmpty(product.getSuppliers())) {
+                            if (!product.getSuppliers().contains(supplier)) {
+                                product.getSuppliers().add(supplier);
                             }
-                        });
-
-                        if (supplierWithIco == null) {
-                            return null;
-                        } else {
-
-                            List<Client> clients = supplierWithIco.getClients();
-                            if (CollectionUtils.isEmpty(clients)) {
-                                log.info("client is not found in database");
-                                return null;
-                            }
-
-                            clients.forEach(client -> {
-                                if (client.getIco().equals(importImportCsvFile.getClientIco())) {
-                                    this.clientWithIco = client;
-                                }
-                            });
-
-                            if (clientWithIco == null) {
-                                return null;
-                            }
-                            order.setClient(clientWithIco);
-                            order.setSupplier(supplierWithIco);
                         }
 
-                        order.setName(importImportCsvFile.getOrderName());
-                        order.setOrdersProducts(Arrays.asList(product));
 
+                        order.setName(importImportCsvFile.getOrderName());
+                        order.setSupplier(supplier);
 
                         OrderProduct orderProduct = new OrderProduct();
                         orderProduct.setProduct(product);
                         orderProduct.setCount(importImportCsvFile.getProductCount());
                         orderProduct.setPrice(importImportCsvFile.getPrice());
                         orderProduct.setOrder(order);
+
+                        if (CollectionUtils.isNotEmpty(order.getOrdersProducts())) {
+                            if (!order.getOrdersProducts().contains(orderProduct))
+                                order.getOrdersProducts().add(orderProduct);
+                        }
+
+                        if (CollectionUtils.isNotEmpty(client.getOrders())) {
+                            if (!client.getOrders().contains(order)) {
+                                client.getOrders().add(order);
+                            }
+                        }
+
                         return orderProductRepository.save(orderProduct);
                     }
 

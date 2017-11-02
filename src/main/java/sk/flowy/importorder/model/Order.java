@@ -44,11 +44,7 @@ public class Order implements Serializable {
     private boolean custom;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "objednavky_produkt",
-            joinColumns = @JoinColumn(name = "objednavka_id", referencedColumnName ="id"),
-            inverseJoinColumns = @JoinColumn(name = "produkt_id", referencedColumnName = "id"))
-    private List<Product> ordersProducts;
-
+    private List<OrderProduct> ordersProducts;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_klient")

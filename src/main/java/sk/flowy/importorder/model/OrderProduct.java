@@ -39,7 +39,6 @@ public class OrderProduct implements Serializable {
     @Column(name = "updated_at")
     private Timestamp updated;
 
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "objednavka_id")
     private Order order;

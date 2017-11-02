@@ -27,34 +27,11 @@ public class Product implements Serializable {
     @Column(name = "nazov")
     private String name;
 
-    @Column(name = "nazov_clear")
-    private String nameClear;
-
-    @Column(name = "aktivny")
-    private Integer active = 1;
-
-    private Boolean weighted;
-
-    @Column(name = "nonBlockable")
-    private Integer nonBlockable;
-
-    @Column(name = "created_at")
-    private Timestamp created;
-
-    @Column(name = "updated_at")
-    private Timestamp updated;
-
-    @Column(name = "deleted_at")
-    private Timestamp deleted;
-
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ean> eans;
 
     @ManyToMany(mappedBy = "products", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Supplier> suppliers;
-
-    @ManyToMany(mappedBy = "ordersProducts", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Order> orders;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderProduct> orderProducts;

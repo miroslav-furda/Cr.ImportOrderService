@@ -1,4 +1,4 @@
-package sk.flowy.importorder;
+package sk.codexa.cr.importorder;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

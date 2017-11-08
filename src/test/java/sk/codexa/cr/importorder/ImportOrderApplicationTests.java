@@ -1,4 +1,4 @@
-package sk.flowy.importorder;
+package sk.codexa.cr.importorder;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

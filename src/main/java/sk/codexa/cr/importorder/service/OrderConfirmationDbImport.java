@@ -1,4 +1,4 @@
-package sk.flowy.importorder.service;
+package sk.codexa.cr.importorder.service;
 
 /**
  * This interface represent confirmation import order.

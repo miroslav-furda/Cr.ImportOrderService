@@ -1,4 +1,4 @@
-package sk.flowy.importorder.service;
+package sk.codexa.cr.importorder.service;
 
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;

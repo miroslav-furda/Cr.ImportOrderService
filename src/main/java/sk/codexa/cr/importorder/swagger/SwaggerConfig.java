@@ -1,4 +1,4 @@
-package sk.flowy.importorder.swagger;
+package sk.codexa.cr.importorder.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

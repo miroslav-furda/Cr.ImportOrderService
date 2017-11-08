@@ -1,10 +1,10 @@
-package sk.flowy.importorder.ftpserverlistener;
+package sk.codexa.cr.importorder.ftpserverlistener;
 
 import lombok.extern.log4j.Log4j;
 import org.apache.ftpserver.ftplet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import sk.flowy.importorder.service.OrderConfirmationDbImport;
+import sk.codexa.cr.importorder.service.OrderConfirmationDbImport;
 
 import java.io.IOException;
 
